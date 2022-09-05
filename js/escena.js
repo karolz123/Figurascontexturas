@@ -1,55 +1,51 @@
-//escena
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
-//fog 
+//escenario
+const scene = new THREE.Scene()
+scene.background = new THREE.Color(0x008000)
 
-var fogColor = new THREE.Color(0x000000);
-scene.background = fogColor;
-scene.fog = new THREE.Fog(fogColor, 0.60, 10); 
+//fondo
+let loader = new THREE.TextureLoader();
+loader.load('../imagenes/luna.jpg', function(texture){
+ scene.background = texture;
+});
 
-//camara 
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-//geometrias 
-class CustomSinCurve extends THREE.Curve {
 
-	constructor( scale = 1 ) {
+//camara
+const camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-		super();
 
-		this.scale = scale;
+//render
+const render = new THREE.WebGLRenderer();
+render.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( render.domElement );
 
-	}
+//GEOMETRIAS 
+const geometry = new THREE.CylinderGeometry( 3, 3, 15, 15 );
+const textureLoader= new THREE.TextureLoader();
+const matcap= textureLoader.load('../imagenes/luna.jpg')
 
-	getPoint( t, optionalTarget = new THREE.Vector3() ) {
+const material13 = new THREE.MeshMatcapMaterial()
+material13.matcap = matcap
+material13.flatShading = true
 
-		const tx = t * 3 - 1.5;
-		const ty = Math.sin( 2 * Math.PI * t );
-		const tz = 0;
+const cube = new THREE.Mesh(geometry,material13)
+scene.add(cube);
+camara.position.z = 40;
+camara.position.x = 1;
+camara.position.y = 1;
 
-		return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+//edges
+const edges = new THREE.EdgesGeometry( geometry );
+const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0x663300 } ) );
+scene.add( line );
 
-	}
-
-}
-
-const path = new CustomSinCurve( 10 );
-const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const mesh = new THREE.Mesh( geometry, material );
-scene.add( mesh );
-
-camera.position.z = 1;
-
-//renderizado
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-//animación
-function animate() {
-	requestAnimationFrame( animate );
-   mesh.rotation.x += 0.01;
-   mesh.rotation.y += 0.01;
-	renderer.render( scene, camera );
+//animación 
+function animate(){
+    requestAnimationFrame( animate );
+    cube.rotation.y += 0.01;
+    cube.rotation.x += 0.01;
+    line.rotation.x += 0.01;
+    line.rotation.y += 0.01;
+    render.render( scene, camara );
 }
 animate();
 

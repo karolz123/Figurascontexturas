@@ -1,31 +1,50 @@
-//escena
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
+//escenario
+const scene = new THREE.Scene()
+scene.background = new THREE.Color(0x008000)
 
+//fondo
 let loader = new THREE.TextureLoader();
-loader.load('../imagenes/jaguar.jpg', function(texture){
+loader.load('../imagenes/cafe.jpg', function(texture){
  scene.background = texture;
 });
 
-//camara 
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-const geometry = new THREE.ConeGeometry( 5, 20, 32 );
-const material = new THREE.MeshBasicMaterial( {color: 'yellow'} );
-const cone = new THREE.Mesh( geometry, material );
-scene.add( cone );
-camera.position.z = 20;
 
-//renderizado
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-//animación
-function animate() {
-	requestAnimationFrame( animate );
-   cone.rotation.x += 0.01;
-   cone.rotation.y += 0.01;
-	renderer.render( scene, camera );
+//camara
+const camara = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+
+//render
+const render = new THREE.WebGLRenderer();
+render.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( render.domElement );
+
+//GEOMETRIAS 
+const geometry = new THREE.CapsuleGeometry( 2, 2, 6, 10 );
+const textureLoader= new THREE.TextureLoader();
+const matcap= textureLoader.load('../imagenes/cafe.jpg')
+
+const material13 = new THREE.MeshMatcapMaterial()
+material13.matcap = matcap
+material13.flatShading = true
+
+const cube = new THREE.Mesh(geometry,material13)
+scene.add(cube);
+camara.position.z = 10;
+camara.position.x = 1;
+camara.position.y = 1;
+
+//edges
+const edges = new THREE.EdgesGeometry( geometry );
+const line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0x663300 } ) );
+scene.add( line );
+
+//animación 
+function animate(){
+    requestAnimationFrame( animate );
+    cube.rotation.y += 0.01;
+    cube.rotation.x += 0.01;
+    line.rotation.x += 0.01;
+    line.rotation.y += 0.01;
+    render.render( scene, camara );
 }
 animate();
-
-//webgl libreria que permite ver los archivos guardados en pantalla 
